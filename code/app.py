@@ -12,6 +12,7 @@ def get_from_redis(*,host_ip=None,redis_host=None):
             output = json.loads(cached_data)
             output["cached"] = True
             output["api_server"] = hostname
+            output["container_name"] = container_name
             return output
         else:
             return set_to_redis(host_ip=host_ip,redis_host=redis_host,api_key=api_key)
@@ -28,6 +29,7 @@ def set_to_redis(*,host_ip=None,redis_host=None,api_key=None):
         api_data = requests.get(url = ipgeolocation_api).json()
         api_data["cached"] = "False"
         api_data["api_server"] = hostname
+        api_data["container_name"] = container_name
         redis_con.set(host_ip,json.dumps(api_data) )
         output = redis_con.get(host_ip)
         output = json.loads(output)
@@ -58,7 +60,7 @@ if __name__ == "__main__":
     redis_host = os.getenv("REDIS_HOST",None)
     redis_port = os.getenv("REDIS_PORT",'6379')
     app_port = os.getenv("APP_PORT",'8080')
-    
+    container_name = os.getenv("CONTAINER_NAME","docker_container")    
     
     app.run(port = app_port,host='0.0.0.0',debug=True )
 
