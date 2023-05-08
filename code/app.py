@@ -2,7 +2,29 @@ import os
 import redis
 import requests, json
 from flask import jsonify, Flask, make_response
+import boto3
+from botocore.exceptions import ClientError
 
+
+def get_secret():
+    secret_name = "ipgeolocation/api_key"
+    region_name = "ap-south-1"
+
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name,
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+        print(get_secret_value_response)
+        return get_secret_value_response['SecretString']
+    except ClientError as e:
+        print("Secrets Error",e)
+    
 def get_from_redis(*,host_ip=None,redis_host=None):
 
     try:
@@ -56,7 +78,9 @@ def home():
 if __name__ == "__main__":
     hostname = os.getenv("HOSTNAME",None)
     #api_key = os.getenv("API_KEY",None)
-    api_key = "0d801ba530ff4c1e82a270c2b97d4d3b" 
+    api_key = json.loads(get_secret())
+    api_key = api_key['api_key'] 
+    print(api_key)
     redis_host = os.getenv("REDIS_HOST",None)
     redis_port = os.getenv("REDIS_PORT",'6379')
     app_port = os.getenv("APP_PORT",'8080')
