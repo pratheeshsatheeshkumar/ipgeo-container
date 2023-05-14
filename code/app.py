@@ -73,7 +73,7 @@ def status():
 
 @app.route('/',strict_slashes=False)
 def home():
-    return make_response(jsonify({ "message":"Version :2.0 Usage: <hostname>:<port>/ip/<ip>","app_name":"app.py","api_server":hostname}),200)    
+    return make_response(jsonify({ "message":"Version :3.0 Usage: <hostname>:<port>/ip/<ip>","app_name":"app.py","api_server":hostname}),200)    
 
 if __name__ == "__main__":
     hostname = os.getenv("HOSTNAME",None)
